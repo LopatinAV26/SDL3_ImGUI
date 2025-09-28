@@ -4,17 +4,10 @@
 
 #include "core.hpp"
 
-std::unique_ptr<Core>core = std::make_unique<Core>();
+auto core = std::make_unique<Core>();
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv)
 {
-	//Логирование запуска
-	SDL_Log("Starting Application...");
-	SDL_Log("Arguments: ");
-	for (int i = 0; i < argc; ++i) {
-		SDL_Log(argv[i]);
-	}
-
 	SDL_AppResult result = core->Init();
 
 	return result;

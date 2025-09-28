@@ -3,14 +3,15 @@
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
+#include <vector>
+#include <string>
 
 // Forward declaration
-struct AppData;
+struct CoreData;
 
 class GuiWindow {
 public:
-	// онструктор принимает ссылку на данные приложени€
-	GuiWindow(const AppData& appData);
+	GuiWindow(const CoreData& appData);
 
 	void InitImGui();
 	void ProcessEventsImGui(const SDL_Event* event);
@@ -18,9 +19,6 @@ public:
 	void RenderImGui();
 	void QuitImGui();
 
-	//ћетод дл€ обновлени€ данных
-	void UpdateAppData(const AppData& newData);
-
 private:
-	const AppData* appData; //”казатель на данные приложени€
+	const CoreData* p_coreData;
 };

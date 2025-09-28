@@ -8,10 +8,10 @@ SDL_AppResult Core::Init()
 		return SDL_APP_FAILURE;
 	}
 
-	appData.mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+	coreData.mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 
-	if (!SDL_CreateWindowAndRenderer("SDL3 ImGui", static_cast<int>(appData.windowWidth * appData.mainScale),
-		static_cast<int>(appData.windowHeight * appData.mainScale), appData.windowFlags, &appData.window, &appData.renderer))
+	if (!SDL_CreateWindowAndRenderer("SDL3 ImGui", static_cast<int>(coreData.windowWidth * coreData.mainScale),
+		static_cast<int>(coreData.windowHeight * coreData.mainScale), coreData.windowFlags, &coreData.window, &coreData.renderer))
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
@@ -19,7 +19,7 @@ SDL_AppResult Core::Init()
 
 	//SDL_SetRenderVSync(appData.renderer, 1);
 
-	imWindow = std::make_unique<GuiWindow>(appData);
+	imWindow = std::make_unique<GuiWindow>(coreData);
 	imWindow->InitImGui();
 
 	return SDL_APP_CONTINUE;
@@ -55,13 +55,13 @@ void Core::Update()
 
 void Core::Render()
 {
-	SDL_RenderClear(appData.renderer);
+	SDL_RenderClear(coreData.renderer);
 
 
 
 	imWindow->RenderImGui();
 	
-	SDL_RenderPresent(appData.renderer);
+	SDL_RenderPresent(coreData.renderer);
 }
 
 void Core::Quit(SDL_AppResult result)
@@ -70,7 +70,7 @@ void Core::Quit(SDL_AppResult result)
 
 	imWindow->QuitImGui();
 
-	SDL_DestroyRenderer(appData.renderer);
-	SDL_DestroyWindow(appData.window);
+	SDL_DestroyRenderer(coreData.renderer);
+	SDL_DestroyWindow(coreData.window);
 	SDL_Quit();
 }

@@ -5,12 +5,12 @@
 
 #include "gui.hpp"
 
-struct AppData {
+struct CoreData {
 	SDL_Window* window{ nullptr };
 	SDL_Renderer* renderer{ nullptr };
 	int windowWidth{ 1600 };
 	int windowHeight{ 900 };
-	SDL_WindowFlags windowFlags{ SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY };
+	SDL_WindowFlags windowFlags{ SDL_WINDOW_RESIZABLE };
 	float mainScale{ 1.f };
 
 	float deltaTime{ 0.f };
@@ -34,7 +34,7 @@ public:
 	void Quit(SDL_AppResult result);
 
 private:
-	AppData appData;
+	CoreData coreData;
 
 	std::unique_ptr<GuiWindow>imWindow;
 };
