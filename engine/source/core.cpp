@@ -10,16 +10,26 @@ SDL_AppResult Core::Init()
 
 	coreData.mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 
-	if (!SDL_CreateWindowAndRenderer("SDL3 ImGui", static_cast<int>(coreData.windowWidth * coreData.mainScale),
-		static_cast<int>(coreData.windowHeight * coreData.mainScale), coreData.windowFlags, &coreData.window, &coreData.renderer))
+	coreData.window = SDL_CreateWindow("SDL3 ImGui",
+									   static_cast<int>(coreData.windowWidth * coreData.mainScale),
+									   static_cast<int>(coreData.windowHeight * coreData.mainScale),
+									   coreData.windowFlags);
+	if (!coreData.window)
 	{
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window and renderer: %s", SDL_GetError());
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
 
-	//SDL_SetRenderVSync(appData.renderer, 1);
+	coreData.renderer = SDL_CreateRenderer(coreData.window, NULL);
+	if (!coreData.renderer)
+	{
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create renderer: %s", SDL_GetError());
+		return SDL_APP_FAILURE;
+	}
 
-	imWindow = std::make_unique<GuiWindow>(coreData);
+	// SDL_SetRenderVSync(coreData.renderer, 1);
+
+	imWindow = new GuiWindow(coreData);
 	imWindow->InitImGui();
 
 	return SDL_APP_CONTINUE;
@@ -27,20 +37,26 @@ SDL_AppResult Core::Init()
 
 SDL_AppResult Core::Iterate()
 {
-	Update();
-	Render();
+	imWindow->IterateImGui();
+	SDL_SetRenderDrawColor(coreData.renderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear(coreData.renderer);
+
+	// Update();
+	// Render();
+
+	imWindow->RenderImGui();
+	SDL_RenderPresent(coreData.renderer);
 
 	return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult Core::ProcessEvent(SDL_Event* event)
+SDL_AppResult Core::ProcessEvent(SDL_Event *event)
 {
-	imWindow->ProcessEventsImGui(event);
+	imWindow->ProcessEventImGui(event);
 
 	switch (event->type)
 	{
 	case SDL_EVENT_QUIT:
-
 		return SDL_APP_SUCCESS;
 		break;
 	}
@@ -48,29 +64,10 @@ SDL_AppResult Core::ProcessEvent(SDL_Event* event)
 	return SDL_APP_CONTINUE;
 }
 
-void Core::Update()
+Core::~Core()
 {
-	imWindow->UpdateImGui();
-}
-
-void Core::Render()
-{
-	SDL_RenderClear(coreData.renderer);
-
-
-
-	imWindow->RenderImGui();
-	
-	SDL_RenderPresent(coreData.renderer);
-}
-
-void Core::Quit(SDL_AppResult result)
-{
-	(void)result;   //чтобы компилятор не ругался на неиспользуемую переменную
-
-	imWindow->QuitImGui();
-
+	delete imWindow;
 	SDL_DestroyRenderer(coreData.renderer);
 	SDL_DestroyWindow(coreData.window);
-	SDL_Quit();
+	SDL_Log("SDL shutdown complete.");
 }
