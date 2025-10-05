@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.0.0)
+cmake_minimum_required(VERSION 3.31.6)
 project(SDL3_Engine VERSION 0.1.0 LANGUAGES CXX)
 
 # set the output directory for built objects.
@@ -41,4 +41,4 @@ endif()
 
 add_subdirectory(engine)
 #add_subdirectory(Game)
-add_subdirectory(third_party)
+add_subdirectory(external)

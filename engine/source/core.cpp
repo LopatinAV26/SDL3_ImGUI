@@ -8,28 +8,31 @@ SDL_AppResult Core::Init()
 		return SDL_APP_FAILURE;
 	}
 
-	coreData.mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+	coreData->mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 
-	coreData.window = SDL_CreateWindow("SDL3 ImGui",
-									   static_cast<int>(coreData.windowWidth * coreData.mainScale),
-									   static_cast<int>(coreData.windowHeight * coreData.mainScale),
-									   coreData.windowFlags);
-	if (!coreData.window)
+	coreData->window = SDL_CreateWindow("SDL3 ImGui",
+										static_cast<int>(coreData->windowWidth * coreData->mainScale),
+										static_cast<int>(coreData->windowHeight * coreData->mainScale),
+										coreData->windowFlags);
+	if (!coreData->window)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
 
-	coreData.renderer = SDL_CreateRenderer(coreData.window, NULL);
-	if (!coreData.renderer)
+	coreData->renderer = SDL_CreateRenderer(coreData->window, NULL); // openGL; vulkan; software
+	if (!coreData->renderer)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create renderer: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
 
-	// SDL_SetRenderVSync(coreData.renderer, 1);
+	SDL_Log("SDL initialized successfully.");
+	SDL_Log(SDL_GetCurrentVideoDriver());
 
-	imWindow = new GuiWindow(coreData);
+	// SDL_SetRenderVSync(coreData.renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
+
+	imWindow = new Gui(coreData);
 	imWindow->InitImGui();
 
 	return SDL_APP_CONTINUE;
@@ -37,20 +40,27 @@ SDL_AppResult Core::Init()
 
 SDL_AppResult Core::Iterate()
 {
+	// Если окно свёрнуто или не в фокусе - приостанавливаем основной цикл
+	if (coreData->isWindowMinimized || !coreData->isWindowFocused)
+	{
+		SDL_Delay(100); // Задержка 100мс для снижения нагрузки на CPU
+		return SDL_APP_CONTINUE;
+	}
+
 	imWindow->IterateImGui();
-	SDL_SetRenderDrawColor(coreData.renderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
-	SDL_RenderClear(coreData.renderer);
+	SDL_SetRenderDrawColor(coreData->renderer, 64, 64, 64, SDL_ALPHA_OPAQUE);
+	SDL_RenderClear(coreData->renderer);
 
 	// Update();
 	// Render();
 
 	imWindow->RenderImGui();
-	SDL_RenderPresent(coreData.renderer);
+	SDL_RenderPresent(coreData->renderer);
 
 	return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult Core::ProcessEvent(SDL_Event *event)
+SDL_AppResult Core::ProcessEvent(const SDL_Event *event)
 {
 	imWindow->ProcessEventImGui(event);
 
@@ -58,6 +68,21 @@ SDL_AppResult Core::ProcessEvent(SDL_Event *event)
 	{
 	case SDL_EVENT_QUIT:
 		return SDL_APP_SUCCESS;
+
+	case SDL_EVENT_WINDOW_MINIMIZED:
+		coreData->isWindowMinimized = true;
+		break;
+
+	case SDL_EVENT_WINDOW_RESTORED:
+		coreData->isWindowMinimized = false;
+		break;
+
+	case SDL_EVENT_WINDOW_FOCUS_GAINED:
+		coreData->isWindowFocused = true;
+		break;
+
+	case SDL_EVENT_WINDOW_FOCUS_LOST:
+		coreData->isWindowFocused = false;
 		break;
 	}
 
@@ -67,7 +92,10 @@ SDL_AppResult Core::ProcessEvent(SDL_Event *event)
 Core::~Core()
 {
 	delete imWindow;
-	SDL_DestroyRenderer(coreData.renderer);
-	SDL_DestroyWindow(coreData.window);
+	imWindow = nullptr;
+	SDL_DestroyRenderer(coreData->renderer);
+	SDL_DestroyWindow(coreData->window);
+	delete coreData;
+	coreData = nullptr;
 	SDL_Log("SDL shutdown complete.");
 }

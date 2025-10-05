@@ -1,17 +1,20 @@
 #include "gui.hpp"
-#include "core.hpp"
+
+#include <iostream>
+
 #include "imgui.h"
 #include "imgui_internal.h"
 #include <SDL3/SDL.h>
 
-GuiWindow::GuiWindow(const CoreData &appData) : p_coreData(&appData)
+#include "core.hpp"
+#include "protocolVMC.hpp"
+
+Gui::Gui(const CoreData *appData)
+	: p_coreData(appData)
 {
-	current_fps = 0.0f;
-	current_frametime = 0.0f;
-	fps_update_timer = 0.0f;
 }
 
-void GuiWindow::InitImGui()
+void Gui::InitImGui()
 {
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -27,13 +30,10 @@ void GuiWindow::InitImGui()
 	font_config.OversampleV = 2;	// Включаем вертикальный оверсэмплинг
 	font_config.PixelSnapH = false; // Отключаем привязку к пикселям для лучшего дробного масштабирования
 
-	// Загружаем основной шрифт
 	io.Fonts->AddFontFromFileTTF("../../resources/fonts/ShareTechMonoRegular.ttf",
-								 16.0f * p_coreData->mainScale,
-								 &font_config,
-								 io.Fonts->GetGlyphRangesCyrillic());
+								 13.0f * 1.5 /* p_coreData->mainScale */,
+								 &font_config);
 
-	// Setup Dear ImGui style
 	// ImGui::StyleColorsDark();
 	// ImGui::StyleColorsLight();
 	ImGui::StyleColorsClassic();
@@ -44,27 +44,47 @@ void GuiWindow::InitImGui()
 	style.FontScaleDpi = p_coreData->mainScale;
 	// style.WindowRounding = 5.0f;
 
-	// Setup Platform/Renderer backends
 	ImGui_ImplSDL3_InitForSDLRenderer(p_coreData->window, p_coreData->renderer);
 	ImGui_ImplSDLRenderer3_Init(p_coreData->renderer);
+
+	SDL_Log("ImGui initialized successfully.");
 }
 
-void GuiWindow::ProcessEventImGui(const SDL_Event *event)
+void Gui::ProcessEventImGui(const SDL_Event *event)
 {
 	ImGui_ImplSDL3_ProcessEvent(event);
 }
 
 // Добавить в начало SDL_AppIterate
-void GuiWindow::IterateImGui()
+void Gui::IterateImGui()
 {
 	ImGui_ImplSDLRenderer3_NewFrame();
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
 
-	FullscreenWindow();
-	DebugWindow();
+	// ImGui::ShowMetricsWindow();
+	// ImGui::ShowDemoWindow();
 
-	ImGui::Render();
+	//---------------------------------
+	if (showDebugWindow)
+		DebugWindow();
+
+	if (showFullscreenWindow)
+		FullscreenWindow();
+
+	// Логика для создания и удаления ProtocolBase///////////////////////
+	if (showProtocolVMC)
+	{
+		p_protocolVMC->Create(showProtocolVMC);
+	}
+	else if (!showProtocolVMC && p_protocolVMC != nullptr)
+	{
+		p_protocolVMC.reset();
+		SDL_Log("ProtocolVMC deleted.");
+	}
+	/////////////////////////////////////////////////////////////////////////
+
+	//---------------------------------
 
 	// Для работы с HiDPI
 	ImGuiIO &io = ImGui::GetIO();
@@ -74,36 +94,28 @@ void GuiWindow::IterateImGui()
 }
 
 // Добавить перед SDL_RenderPresent
-void GuiWindow::RenderImGui()
+void Gui::RenderImGui()
 {
+	ImGui::Render();
 	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), p_coreData->renderer);
 }
 
-GuiWindow::~GuiWindow()
-{
-	ImGui_ImplSDLRenderer3_Shutdown();
-	ImGui_ImplSDL3_Shutdown();
-	ImGui::DestroyContext();
-	p_coreData = nullptr;
-	SDL_Log("ImGui shutdown complete.");
-}
-
-void GuiWindow::DebugWindow()
+void Gui::DebugWindow()
 {
 	ImGuiIO &io = ImGui::GetIO();
-	ImGui::Begin("DebugWindow", nullptr);
+	ImGui::Begin("DebugWindow", &showDebugWindow);
 
 	ImGui::Text("API %s", SDL_GetRendererName(p_coreData->renderer));
 
-	// Обновляем значения FPS
-	fps_update_timer += io.DeltaTime;
-	if (fps_update_timer >= 0.5f)
+	fpsUpdateTimer += io.DeltaTime;
+	if (fpsUpdateTimer >= 0.5f)
 	{
-		current_fps = io.Framerate;
-		current_frametime = 1000.0f / io.Framerate;
-		fps_update_timer = 0.0f;
+		currentFrametime = {1000.f / io.Framerate};
+		framerate = {io.Framerate};
+		fpsUpdateTimer = {0.f};
 	}
-	ImGui::Text("Application average %.2f ms/frame (%.0f FPS)", current_frametime, current_fps);
+	ImGui::Text("Application average %.2f ms/frame (%.0f FPS)", currentFrametime, framerate);
+
 	if (ImGui::IsMousePosValid())
 		ImGui::Text("Mouse pos: (%g, %g)", io.MousePos.x, io.MousePos.y);
 	else
@@ -112,36 +124,45 @@ void GuiWindow::DebugWindow()
 	ImGui::End();
 }
 
-void GuiWindow::FullscreenWindow()
+void Gui::FullscreenWindow()
 {
 	ImGuiViewport *viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
 
-	ImGuiWindowFlags window_flags = //ImGuiWindowFlags_NoDecoration |
-									ImGuiWindowFlags_NoMove |
-									ImGuiWindowFlags_NoResize |
-									ImGuiWindowFlags_NoSavedSettings |
-									ImGuiWindowFlags_NoBringToFrontOnFocus;
+	ImGuiWindowFlags window_flags = // ImGuiWindowFlags_NoDecoration |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoBringToFrontOnFocus;
 
-	if (ImGui::Begin("Main Window", NULL, window_flags))
+	ImGui::Begin("Main Window", &showFullscreenWindow, window_flags);
+
+	// Логика в главном окне-------------------------------------------------------------------------
+	if (ImGui::Button("Создать заключение ВИК"))
 	{
-		// Создаем центрированную группу кнопок
-		float window_width = ImGui::GetWindowSize().x;
-		float buttons_width = 120.0f * 2 + ImGui::GetStyle().ItemSpacing.x;
-		ImGui::SetCursorPosX((window_width - buttons_width) * 0.5f);
-
-		if (ImGui::Button("Кнопка 1", ImVec2(120, 0)))
+		showProtocolVMC = true;
+		if (p_protocolVMC == nullptr)
 		{
-			// Действие для кнопки 1
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Кнопка 2", ImVec2(120, 0)))
-		{
-			// Действие для кнопки 2
+			p_protocolVMC = std::make_unique<ProtocolVMC>();
+			SDL_Log("ProtocolVMC created.");
 		}
 	}
+
+	if (ImGui::Button("Нормативная документация"))
+	{
+		// Действие для кнопки 2
+	}
+	//---------------------------------------------------------------------------------------------
+
 	ImGui::End();
+}
+
+Gui::~Gui()
+{
+	ImGui_ImplSDLRenderer3_Shutdown();
+	ImGui_ImplSDL3_Shutdown();
+	ImGui::DestroyContext();
+	p_coreData = nullptr;
+	SDL_Log("ImGui shutdown complete.");
 }

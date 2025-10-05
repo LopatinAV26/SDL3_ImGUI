@@ -7,15 +7,17 @@ find_package(SDL3 CONFIG REQUIRED)	#Пока не подключена лока�
 #---------------------------------------------------------------------------------------------
 
 # imgui --------------------------------------------------------------------------------------
-target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/third_party/imgui")
+target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/external/imgui")
 add_library(imgui STATIC)
 
 file(GLOB_RECURSE SRC_FILES imgui/*.cpp CMAKE_CONFIGURE_DEPENDS)
 target_sources(imgui PRIVATE ${SRC_FILES})
 
 target_link_libraries(imgui PRIVATE SDL3::SDL3)
-# imgui -----------------------------------------------------------
+
+# toml++ ------------------------------------------------------------------------------------
+target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/external/toml++")
+
 
 #json--------------------------------------
 #target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/Third_party/nlohmann")
-#json--------------------------------------
