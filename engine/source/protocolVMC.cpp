@@ -2,34 +2,43 @@
 
 ProtocolVMC::ProtocolVMC()
 {
+    ParseConfig("resources/config/protocol_VIC_default.toml");
     SDL_Log("ProtocolVMC constructed.\n");
 }
 
-void ProtocolVMC::Create(bool &showProtocol)
+void ProtocolVMC::CreateProtocol(bool &showProtocol)
 {
     ImGui::Begin("Protocol VMC Window", &showProtocol);
     {
-        {
-            ImGui::BeginTable("Protocol VMC Table", 3, tableFlags);
+        ImGui::InputText("Дата выдачи заключения", &data.dateOfIssue);
+        ImGui::InputText("Дата проведения контроля", &data.controlDate);
+        ImGui::InputText("Номер сварного соединения", &data.weldNumber);
+        ImGui::InputTextMultiline("Наименование объекта контроля", &data.objectName);
 
-            ImGui::TableSetupColumn("Column 1");
-            ImGui::TableSetupColumn("Column 2");
-            ImGui::TableSetupColumn("Column 3");
-            ImGui::TableHeadersRow();
-
-            // Sample Data specific to VMC
-            ImGui::TableNextRow();
-            ImGui::TableNextColumn();
-            ImGui::Text("VMC Data 1");
-            ImGui::TableNextColumn();
-            ImGui::Text("VMC Data 2");
-            ImGui::TableNextColumn();
-            ImGui::Text("VMC Data 3");
-
-            ImGui::EndTable();
-        }
     }
+
     ImGui::End();
+}
+
+void ProtocolVMC::ParseConfig(const std::string &configPath)
+{
+    try
+    {
+        configVMC = toml::parse_file(configPath);
+        SDL_Log("Config file '%s' parsed successfully.\n", configPath.c_str());
+    }
+    catch (const toml::parse_error &err)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to parse config file '%s': %s\n", configPath.c_str(), err.what());
+    }
+}
+
+void ProtocolVMC::SaveProtocol()
+{
+    configVMC = toml::table{{"Технологическая карта", data.techCard}};
+    std::cout << configVMC << std::endl;
+    std::ofstream of("/home/av26/Programming/SDL3_ImGUI/build/Debug/resources/config/protocol_VIC_default.toml");
+    of << configVMC;
 }
 
 ProtocolVMC::~ProtocolVMC()

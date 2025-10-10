@@ -8,10 +8,13 @@ public:
     ProtocolVMC();
     ~ProtocolVMC();
 
-    virtual void Create(bool &showProtocol) override;
+    virtual void CreateProtocol(bool &showProtocol) override;
+    virtual void ParseConfig(const std::string &configPath) override;
+    virtual void SaveProtocol() override;
 
     ProtocolData data;
 
 private:
-    ImGuiTableColumnFlags tableFlags = ImGuiTableFlags_Borders;
+    toml::table configVMC;
+    ImGuiTableColumnFlags tableFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable;
 };

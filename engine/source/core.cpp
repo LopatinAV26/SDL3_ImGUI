@@ -30,7 +30,7 @@ SDL_AppResult Core::Init()
 	SDL_Log("SDL initialized successfully.");
 	SDL_Log(SDL_GetCurrentVideoDriver());
 
-	// SDL_SetRenderVSync(coreData.renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
+	 //SDL_SetRenderVSync(coreData->renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
 
 	imWindow = new Gui(coreData);
 	imWindow->InitImGui();

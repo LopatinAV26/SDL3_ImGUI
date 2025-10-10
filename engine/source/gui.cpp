@@ -19,8 +19,7 @@ void Gui::InitImGui()
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
-	ImGuiIO &io = ImGui::GetIO();
-	(void)io;
+	[[maybe_unused]] ImGuiIO &io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
 
@@ -30,10 +29,13 @@ void Gui::InitImGui()
 	font_config.OversampleV = 2;	// Включаем вертикальный оверсэмплинг
 	font_config.PixelSnapH = false; // Отключаем привязку к пикселям для лучшего дробного масштабирования
 
-	io.Fonts->AddFontFromFileTTF("../../resources/fonts/ShareTechMonoRegular.ttf",
+	
+	//!!!Реализовать проверку наличия файла шрифта средствами SDL3, либо написать загрузчик ресурсов
+	// и грузить шрифт из ресурсов
+	io.Fonts->AddFontFromFileTTF("resources/fonts/ShareTechMonoRegular.ttf",
 								 13.0f * 1.5 /* p_coreData->mainScale */,
 								 &font_config);
-
+	
 	// ImGui::StyleColorsDark();
 	// ImGui::StyleColorsLight();
 	ImGui::StyleColorsClassic();
@@ -75,7 +77,7 @@ void Gui::IterateImGui()
 	// Логика для создания и удаления ProtocolBase///////////////////////
 	if (showProtocolVMC)
 	{
-		p_protocolVMC->Create(showProtocolVMC);
+		p_protocolVMC->CreateProtocol(showProtocolVMC);
 	}
 	else if (!showProtocolVMC && p_protocolVMC != nullptr)
 	{

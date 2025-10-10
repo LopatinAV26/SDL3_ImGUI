@@ -40,5 +40,4 @@ endif()
    # target_compile_options(main PUBLIC -Wall)
 
 add_subdirectory(engine)
-#add_subdirectory(Game)
 add_subdirectory(external)
