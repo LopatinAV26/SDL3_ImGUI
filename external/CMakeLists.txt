@@ -1,23 +1,32 @@
-# SDL --------------------------------------------------------------------------------------
-find_package(SDL3 CONFIG REQUIRED)	#Пока не подключена локально, требуется для imgui
-#add_library(sdl3 INTERFACE)
-#target_include_directories(sdl3 INTERFACE $ENV{VULKAN_SDK}/Include/SDL3 )
-#target_link_directories(sdl3 INTERFACE $ENV{VULKAN_SDK}/Lib )
-#target_link_libraries(sdl3 INTERFACE SDL3 SDL3main)
-#---------------------------------------------------------------------------------------------
+# SDL3 ---------------------------------------------------------------------------------------
+include(FetchContent)
+
+FetchContent_Declare(SDL3
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+    GIT_TAG release-3.2.24
+)
+FetchContent_MakeAvailable(SDL3)
+
+# PoDoFo ------------------------------------------------------------------------------------
+include(FetchContent)
+
+set(PODOFO_BUILD_LIB_ONLY TRUE CACHE BOOL "" FORCE)
+set(PODOFO_BUILD_STATIC TRUE CACHE BOOL "" FORCE)
+FetchContent_Declare(podofo
+    GIT_REPOSITORY https://github.com/podofo/podofo.git
+    GIT_TAG 1.0.2
+)
+FetchContent_MakeAvailable(podofo)
+
+#Без этой команды #include <podofo/podofo.h> не включается
+target_include_directories(${PROJECT_NAME} PRIVATE ${PODOFO_INCLUDE_DIRS})
 
 # imgui --------------------------------------------------------------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/external/imgui")
 add_library(imgui STATIC)
-
 file(GLOB_RECURSE SRC_FILES imgui/*.cpp CMAKE_CONFIGURE_DEPENDS)
 target_sources(imgui PRIVATE ${SRC_FILES})
-
 target_link_libraries(imgui PRIVATE SDL3::SDL3)
 
 # toml++ ------------------------------------------------------------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/external/toml++")
-
-
-#json--------------------------------------
-#target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/Third_party/nlohmann")

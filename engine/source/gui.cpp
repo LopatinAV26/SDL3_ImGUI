@@ -1,9 +1,5 @@
 #include "gui.hpp"
-
-#include <iostream>
-
-#include "imgui.h"
-#include "imgui_internal.h"
+ 
 #include <SDL3/SDL.h>
 
 #include "core.hpp"
@@ -12,6 +8,7 @@
 Gui::Gui(const CoreData *appData)
 	: p_coreData(appData)
 {
+	p_protocolVMC = std::make_unique<ProtocolVMC>();
 }
 
 void Gui::InitImGui()
@@ -29,13 +26,10 @@ void Gui::InitImGui()
 	font_config.OversampleV = 2;	// Включаем вертикальный оверсэмплинг
 	font_config.PixelSnapH = false; // Отключаем привязку к пикселям для лучшего дробного масштабирования
 
-	
-	//!!!Реализовать проверку наличия файла шрифта средствами SDL3, либо написать загрузчик ресурсов
-	// и грузить шрифт из ресурсов
 	io.Fonts->AddFontFromFileTTF("resources/fonts/ShareTechMonoRegular.ttf",
-								 13.0f * 1.5 /* p_coreData->mainScale */,
+								 13.0f,
 								 &font_config);
-	
+
 	// ImGui::StyleColorsDark();
 	// ImGui::StyleColorsLight();
 	ImGui::StyleColorsClassic();
@@ -79,11 +73,6 @@ void Gui::IterateImGui()
 	{
 		p_protocolVMC->CreateProtocol(showProtocolVMC);
 	}
-	else if (!showProtocolVMC && p_protocolVMC != nullptr)
-	{
-		p_protocolVMC.reset();
-		SDL_Log("ProtocolVMC deleted.");
-	}
 	/////////////////////////////////////////////////////////////////////////
 
 	//---------------------------------
@@ -106,23 +95,24 @@ void Gui::DebugWindow()
 {
 	ImGuiIO &io = ImGui::GetIO();
 	ImGui::Begin("DebugWindow", &showDebugWindow);
-
-	ImGui::Text("API %s", SDL_GetRendererName(p_coreData->renderer));
-
-	fpsUpdateTimer += io.DeltaTime;
-	if (fpsUpdateTimer >= 0.5f)
 	{
-		currentFrametime = {1000.f / io.Framerate};
-		framerate = {io.Framerate};
-		fpsUpdateTimer = {0.f};
+		ImGui::Text("API: %s", SDL_GetRendererName(p_coreData->renderer));
+		ImGui::Text("Driver:  %s", p_coreData->driver.c_str());
+
+		fpsUpdateTimer += io.DeltaTime;
+		if (fpsUpdateTimer >= 0.5f)
+		{
+			currentFrametime = {1000.f / io.Framerate};
+			framerate = {io.Framerate};
+			fpsUpdateTimer = {0.f};
+		}
+		ImGui::Text("Application average %.2f ms/frame (%.0f FPS)", currentFrametime, framerate);
+
+		if (ImGui::IsMousePosValid())
+			ImGui::Text("Mouse pos: (%g, %g)", io.MousePos.x, io.MousePos.y);
+		else
+			ImGui::Text("Mouse pos: <INVALID>");
 	}
-	ImGui::Text("Application average %.2f ms/frame (%.0f FPS)", currentFrametime, framerate);
-
-	if (ImGui::IsMousePosValid())
-		ImGui::Text("Mouse pos: (%g, %g)", io.MousePos.x, io.MousePos.y);
-	else
-		ImGui::Text("Mouse pos: <INVALID>");
-
 	ImGui::End();
 }
 
@@ -144,11 +134,6 @@ void Gui::FullscreenWindow()
 	if (ImGui::Button("Создать заключение ВИК"))
 	{
 		showProtocolVMC = true;
-		if (p_protocolVMC == nullptr)
-		{
-			p_protocolVMC = std::make_unique<ProtocolVMC>();
-			SDL_Log("ProtocolVMC created.");
-		}
 	}
 
 	if (ImGui::Button("Нормативная документация"))

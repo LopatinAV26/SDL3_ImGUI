@@ -6,15 +6,15 @@ class ProtocolVMC : public ProtocolBase
 {
 public:
     ProtocolVMC();
-    ~ProtocolVMC();
+    virtual ~ProtocolVMC();
 
     virtual void CreateProtocol(bool &showProtocol) override;
-    virtual void ParseConfig(const std::string &configPath) override;
     virtual void SaveProtocol() override;
-
-    ProtocolData data;
+    void CreateTable();
 
 private:
-    toml::table configVMC;
+    std::shared_ptr<ProtocolData> protocolData = std::make_shared<ProtocolData>();
+    // toml::table protocolVMC;
+
     ImGuiTableColumnFlags tableFlags = ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable;
 };

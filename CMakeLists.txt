@@ -28,7 +28,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
     message("Debug mode: ${CMAKE_CXX_FLAGS_DEBUG}")
 
 elseif(CMAKE_BUILD_TYPE AND (CMAKE_BUILD_TYPE STREQUAL "Release"))
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -O3 -flto")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -flto")
     message("Release mode: ${CMAKE_CXX_FLAGS_RELEASE}")
 else()
     message("else: ${CMAKE_BUILD_TYPE}")

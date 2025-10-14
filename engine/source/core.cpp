@@ -1,5 +1,12 @@
 #include "core.hpp"
 
+#include "gui.hpp"
+
+Core::Core()
+	: coreData{new CoreData}
+{
+}
+
 SDL_AppResult Core::Init()
 {
 	if (!SDL_Init(SDL_INIT_VIDEO))
@@ -8,11 +15,11 @@ SDL_AppResult Core::Init()
 		return SDL_APP_FAILURE;
 	}
 
-	coreData->mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+	// coreData->mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 
 	coreData->window = SDL_CreateWindow("SDL3 ImGui",
-										static_cast<int>(coreData->windowWidth * coreData->mainScale),
-										static_cast<int>(coreData->windowHeight * coreData->mainScale),
+										(coreData->windowWidth * coreData->mainScale),
+										(coreData->windowHeight * coreData->mainScale),
 										coreData->windowFlags);
 	if (!coreData->window)
 	{
@@ -28,9 +35,9 @@ SDL_AppResult Core::Init()
 	}
 
 	SDL_Log("SDL initialized successfully.");
-	SDL_Log(SDL_GetCurrentVideoDriver());
+	coreData->driver = SDL_GetCurrentVideoDriver();
 
-	 //SDL_SetRenderVSync(coreData->renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
+	// SDL_SetRenderVSync(coreData->renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
 
 	imWindow = new Gui(coreData);
 	imWindow->InitImGui();
