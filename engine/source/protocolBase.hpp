@@ -21,13 +21,13 @@ public:
 protected:
     virtual void CreateProtocol(bool &showProtocol) = 0;
     virtual void SaveProtocol() = 0;
-    void ParseConfig(const std::string &pathToConfig, toml::table &tbl);
+    void ParseConfig(const std::string_view &pathToConfig, toml::table &tbl);
     void GetDefaultProtocolData();
 
     std::shared_ptr<ProtocolData> baseProtocolData = std::make_shared<ProtocolData>();
 
 private:
-    std::string pathToDefaultProtocol{"resources/config/base_protocol_data.toml"};
+    std::string_view pathToDefaultProtocol{"resources/config/base_protocol_data.toml"};
     toml::table baseTable;
 };
 

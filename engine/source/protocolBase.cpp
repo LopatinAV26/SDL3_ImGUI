@@ -10,16 +10,16 @@ ProtocolBase::~ProtocolBase()
     SDL_Log("ProtocolBase destructed.\n");
 }
 
-void ProtocolBase::ParseConfig(const std::string &pathToConfig, toml::table &tbl)
+void ProtocolBase::ParseConfig(const std::string_view &pathToConfig, toml::table &tbl)
 {
     try
     {
         tbl = toml::parse_file(pathToConfig);
-        SDL_Log("Config file '%s' parsed successfully.\n", pathToConfig.c_str());
+        SDL_Log("Config file '%s' parsed successfully.\n", pathToConfig.data());
     }
     catch (const toml::parse_error &err)
     {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to parse config file '%s': %s\n", pathToConfig.c_str(), err.what());
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "Failed to parse config file '%s': %s\n", pathToConfig.data(), err.what());
     }
 }
 

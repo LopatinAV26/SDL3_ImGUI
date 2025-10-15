@@ -97,7 +97,7 @@ void Gui::DebugWindow()
 	ImGui::Begin("DebugWindow", &showDebugWindow);
 	{
 		ImGui::Text("API: %s", SDL_GetRendererName(p_coreData->renderer));
-		ImGui::Text("Driver:  %s", p_coreData->driver.c_str());
+		ImGui::Text("Driver: %s", p_coreData->driver.data());
 
 		fpsUpdateTimer += io.DeltaTime;
 		if (fpsUpdateTimer >= 0.5f)

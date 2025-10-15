@@ -18,11 +18,17 @@ void ProtocolVMC::CreateProtocol(bool &showProtocol)
 
         ImVec2 sizeTextField{0.f, 70.f};
 
-        ImGui::InputTextMultiline("Наименование ЛНК", &protocolData->nameLab, sizeTextField, ImGuiInputTextFlags_WordWrap);
-        ImGui::InputText("Номер свидетельства об аттестации", &protocolData->numberAttestation);
-        ImGui::InputTextMultiline("Наименование объекта", &protocolData->objectName, sizeTextField, ImGuiInputTextFlags_WordWrap);
+        ImGui::Text("Наименование ЛНК");
+        ImGui::InputTextMultiline("##Наименование ЛНК", &protocolData->nameLab, sizeTextField, ImGuiInputTextFlags_WordWrap);
+        
+        ImGui::Text("Номер свидетельства об аттестации");
+        ImGui::InputText("##Номер свидетельства об аттестации", &protocolData->numberAttestation);
 
-        if (ImGui::BeginCombo("Категория трубопровода",
+        ImGui::Text("Наименование объекта");
+        ImGui::InputTextMultiline("##Наименование объекта", &protocolData->objectName, sizeTextField, ImGuiInputTextFlags_WordWrap);
+
+        ImGui::Text("Категория трубопровода");
+        if (ImGui::BeginCombo("##Категория трубопровода",
                               protocolData->pipeCategoryVector.at(protocolData->pipeCategoryIndex).c_str()))
         {
             for (int i = 0; i < protocolData->pipeCategoryVector.size(); ++i)
@@ -37,11 +43,20 @@ void ProtocolVMC::CreateProtocol(bool &showProtocol)
             ImGui::EndCombo();
         }
 
-        ImGui::InputTextMultiline("Подрядная организация", &protocolData->contractorOrganization, sizeTextField, ImGuiInputTextFlags_WordWrap);
-        ImGui::InputTextMultiline("Организация заказчика", &protocolData->customerOrganization, sizeTextField, ImGuiInputTextFlags_WordWrap);
-        ImGui::InputText("Дата выдачи заключения", &protocolData->dateOfIssue);
-        ImGui::InputText("Дата проведения контроля", &protocolData->controlDate);
-        ImGui::InputText("Номер сварного соединения", &protocolData->weldNumber);
+        ImGui::Text("Подрядная организация");
+        ImGui::InputTextMultiline("##Подрядная организация", &protocolData->contractorOrganization, sizeTextField, ImGuiInputTextFlags_WordWrap);
+
+        ImGui::Text("Организация заказчика");
+        ImGui::InputTextMultiline("##Организация заказчика", &protocolData->customerOrganization, sizeTextField, ImGuiInputTextFlags_WordWrap);
+
+        ImGui::Text("Дата выдачи заключения");
+        ImGui::InputText("##Дата выдачи заключения", &protocolData->dateOfIssue);
+
+        ImGui::Text("Дата проведения контроля");
+        ImGui::InputText("##Дата проведения контроля", &protocolData->controlDate);
+
+        ImGui::Text("Номер сварного соединения");
+        ImGui::InputText("##Номер сварного соединения", &protocolData->weldNumber);
 
         // CreateTable();
     }

@@ -31,8 +31,8 @@ struct CoreData
 	int windowWidth{1280};
 	int windowHeight{720};
 	SDL_WindowFlags windowFlags{SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY};
-	float mainScale{1.5};
-	std::string driver;
+	float mainScale{1.25};
+	std::string_view driver;
 	// float deltaTime{0.f};
 
 	// Флаги состояния окна
