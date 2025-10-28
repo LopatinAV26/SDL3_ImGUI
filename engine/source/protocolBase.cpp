@@ -10,7 +10,7 @@ ProtocolBase::~ProtocolBase()
     SDL_Log("ProtocolBase destructed.\n");
 }
 
-void ProtocolBase::ParseConfig(const std::string_view &pathToConfig, toml::table &tbl)
+void ProtocolBase::ParseConfig(std::string_view pathToConfig, toml::table &tbl)
 {
     try
     {
@@ -50,6 +50,7 @@ void ProtocolBase::GetDefaultProtocolData()
 
         // Категория трубопровода
         auto arr = baseTable["pipeCategoryVector"].as_array();
+        baseProtocolData->pipeCategoryVector.clear();
         baseProtocolData->pipeCategoryVector.reserve(arr->size());
         for (const auto &i : *arr)
         {

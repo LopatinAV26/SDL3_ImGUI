@@ -1,28 +1,8 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include <SDL3/SDL.h>
-
-struct CoreData;
-class Gui;
-class Core
-{
-public:
-	Core();
-	Core(const Core &) = delete;
-	Core &operator=(const Core &) = delete;
-	Core(Core &&) = delete;
-	Core &operator=(Core &&) = delete;
-	~Core();
-
-	SDL_AppResult Init();
-	SDL_AppResult Iterate();
-	SDL_AppResult ProcessEvent(const SDL_Event *event);
-
-private:
-	CoreData *coreData{nullptr};
-	Gui *imWindow{nullptr};
-};
 
 struct CoreData
 {
@@ -39,3 +19,24 @@ struct CoreData
 	bool isWindowFocused{true};
 	bool isWindowMinimized{false};
 };
+
+class Gui;
+class Core
+{
+public:
+	Core();
+	Core(const Core &) = delete;
+	Core &operator=(const Core &) = delete;
+	Core(Core &&) = delete;
+	Core &operator=(Core &&) = delete;
+	~Core();
+
+	SDL_AppResult Init();
+	SDL_AppResult Iterate();
+	SDL_AppResult ProcessEvent(const SDL_Event *event);
+
+private:
+	CoreData *coreData = new CoreData();
+	std::unique_ptr<Gui> imWindow;
+};
+

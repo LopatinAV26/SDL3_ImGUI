@@ -1,14 +1,12 @@
 #include "gui.hpp"
- 
+
 #include <SDL3/SDL.h>
 
 #include "core.hpp"
-#include "protocolVMC.hpp"
 
 Gui::Gui(const CoreData *appData)
-	: p_coreData(appData)
+	: p_coreData{appData}
 {
-	p_protocolVMC = std::make_unique<ProtocolVMC>();
 }
 
 void Gui::InitImGui()
@@ -16,6 +14,7 @@ void Gui::InitImGui()
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImPlot::CreateContext();
 	[[maybe_unused]] ImGuiIO &io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
@@ -38,7 +37,7 @@ void Gui::InitImGui()
 	ImGuiStyle &style = ImGui::GetStyle();
 	style.ScaleAllSizes(p_coreData->mainScale);
 	style.FontScaleDpi = p_coreData->mainScale;
-	// style.WindowRounding = 5.0f;
+	style.WindowRounding = 4.0f;
 
 	ImGui_ImplSDL3_InitForSDLRenderer(p_coreData->window, p_coreData->renderer);
 	ImGui_ImplSDLRenderer3_Init(p_coreData->renderer);
@@ -68,13 +67,21 @@ void Gui::IterateImGui()
 	if (showFullscreenWindow)
 		FullscreenWindow();
 
-	// Логика для создания и удаления ProtocolBase///////////////////////
 	if (showProtocolVMC)
+		p_protocolVMC->WindowProtocol(showProtocolVMC);
+	if (!showProtocolVMC && p_protocolVMC != nullptr)
 	{
-		p_protocolVMC->CreateProtocol(showProtocolVMC);
+		SDL_Log("ProtocolVMC closed");
+		p_protocolVMC.reset();
 	}
-	/////////////////////////////////////////////////////////////////////////
 
+	if (showNomogram)
+		p_nomogram->NomogramWindow(showNomogram);
+	if (!showNomogram && p_nomogram != nullptr)
+	{
+		SDL_Log("Nomogram closed");
+		p_nomogram.reset();
+	}
 	//---------------------------------
 
 	// Для работы с HiDPI
@@ -118,7 +125,7 @@ void Gui::DebugWindow()
 
 void Gui::FullscreenWindow()
 {
-	ImGuiViewport *viewport = ImGui::GetMainViewport();
+	/* ImGuiViewport *viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
 
@@ -126,21 +133,31 @@ void Gui::FullscreenWindow()
 		ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoResize |
 		ImGuiWindowFlags_NoSavedSettings |
-		ImGuiWindowFlags_NoBringToFrontOnFocus;
+		ImGuiWindowFlags_NoBringToFrontOnFocus; */
+
+	// Кнопка без окна///////////////////////////////////////////////
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration |
+									// ImGuiWindowFlags_NoMove |
+									ImGuiWindowFlags_AlwaysAutoResize |
+									// ImGuiWindowFlags_NoSavedSettings |
+									ImGuiWindowFlags_NoBringToFrontOnFocus |
+									ImGuiWindowFlags_NoBackground;
 
 	ImGui::Begin("Main Window", &showFullscreenWindow, window_flags);
 
-	// Логика в главном окне-------------------------------------------------------------------------
 	if (ImGui::Button("Создать заключение ВИК"))
 	{
 		showProtocolVMC = true;
+		if (p_protocolVMC == nullptr)
+			p_protocolVMC = std::make_unique<ProtocolVMC>();
 	}
 
-	if (ImGui::Button("Нормативная документация"))
+	if (ImGui::Button("Открыть номограмму РК"))
 	{
-		// Действие для кнопки 2
+		showNomogram = true;
+		if (p_nomogram == nullptr)
+			p_nomogram = std::make_unique<Nomogram>();
 	}
-	//---------------------------------------------------------------------------------------------
 
 	ImGui::End();
 }
@@ -149,6 +166,7 @@ Gui::~Gui()
 {
 	ImGui_ImplSDLRenderer3_Shutdown();
 	ImGui_ImplSDL3_Shutdown();
+	ImPlot::DestroyContext();
 	ImGui::DestroyContext();
 	p_coreData = nullptr;
 	SDL_Log("ImGui shutdown complete.");

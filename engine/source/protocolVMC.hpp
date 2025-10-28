@@ -5,10 +5,10 @@
 class ProtocolVMC : public ProtocolBase
 {
 public:
-    ProtocolVMC();
+    explicit ProtocolVMC();
     virtual ~ProtocolVMC();
 
-    virtual void CreateProtocol(bool &showProtocol) override;
+    virtual void WindowProtocol(bool &isOpen) override;
     virtual void SaveProtocol() override;
     void CreateTable();
 

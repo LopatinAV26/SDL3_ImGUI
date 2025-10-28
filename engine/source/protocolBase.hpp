@@ -5,7 +5,7 @@
 #include <vector>
 #include <optional>
 #include <iostream>
-#include "toml.hpp"
+#include <toml++/toml.hpp>
 #include "imgui.h"
 #include "imgui_stdlib.h"
 #include <SDL3/SDL.h>
@@ -19,14 +19,15 @@ public:
     virtual ~ProtocolBase();
 
 protected:
-    virtual void CreateProtocol(bool &showProtocol) = 0;
-    virtual void SaveProtocol() = 0;
-    void ParseConfig(const std::string_view &pathToConfig, toml::table &tbl);
+    void ParseConfig(std::string_view pathToConfig, toml::table &tbl);
     void GetDefaultProtocolData();
 
     std::shared_ptr<ProtocolData> baseProtocolData = std::make_shared<ProtocolData>();
 
 private:
+    virtual void WindowProtocol(bool &showProtocol) = 0;
+    virtual void SaveProtocol() = 0;
+
     std::string_view pathToDefaultProtocol{"resources/config/base_protocol_data.toml"};
     toml::table baseTable;
 };
@@ -51,7 +52,7 @@ struct ProtocolData
     std::string contractorOrganization{"Подрядная организация"};
     std::string customerOrganization{"Организация заказчика"};
 
-    std::string technologicalControlMap{"ТК-ТНДВ-ВИК", "ТК-ТНДВ-УК"};
+    std::string technologicalControlMap = {"ТК-ТНДВ-ВИК"};
     int technologicalControlMapIndex{0};
 
     std::string equipment{"Средства контроля"};

@@ -3,7 +3,7 @@
 #include "gui.hpp"
 
 Core::Core()
-	: coreData{new CoreData}
+	//: coreData{new CoreData}
 {
 }
 
@@ -17,7 +17,7 @@ SDL_AppResult Core::Init()
 
 	// coreData->mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 
-	coreData->window = SDL_CreateWindow("SDL3 ImGui",
+	coreData->window = SDL_CreateWindow("NDT",
 										(coreData->windowWidth * coreData->mainScale),
 										(coreData->windowHeight * coreData->mainScale),
 										coreData->windowFlags);
@@ -39,7 +39,7 @@ SDL_AppResult Core::Init()
 
 	// SDL_SetRenderVSync(coreData->renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
 
-	imWindow = new Gui(coreData);
+	imWindow = std::make_unique<Gui>(coreData);
 	imWindow->InitImGui();
 
 	return SDL_APP_CONTINUE;
@@ -98,8 +98,7 @@ SDL_AppResult Core::ProcessEvent(const SDL_Event *event)
 
 Core::~Core()
 {
-	delete imWindow;
-	imWindow = nullptr;
+	//imWindow.reset();
 	SDL_DestroyRenderer(coreData->renderer);
 	SDL_DestroyWindow(coreData->window);
 	delete coreData;
