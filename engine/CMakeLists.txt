@@ -8,7 +8,7 @@ if(MSVC)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-                                    SDL3_image::SDL3_image
+                                    #SDL3_image::SDL3_image
                                     #SDL3_mixer::SDL3_mixer
                                     #SDL3_ttf::SDL3_ttf
                                     imgui

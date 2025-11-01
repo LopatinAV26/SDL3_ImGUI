@@ -3,7 +3,7 @@
 #include "gui.hpp"
 
 Core::Core()
-	//: coreData{new CoreData}
+//: coreData{new CoreData}
 {
 }
 
@@ -98,7 +98,7 @@ SDL_AppResult Core::ProcessEvent(const SDL_Event *event)
 
 Core::~Core()
 {
-	//imWindow.reset();
+	// imWindow.reset();
 	SDL_DestroyRenderer(coreData->renderer);
 	SDL_DestroyWindow(coreData->window);
 	delete coreData;
