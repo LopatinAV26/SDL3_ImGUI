@@ -15,19 +15,19 @@ SDL_AppResult Core::Init()
 		return SDL_APP_FAILURE;
 	}
 
-	// coreData->mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+	coreData->mainScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
 
 	coreData->window = SDL_CreateWindow("NDT",
-										(coreData->windowWidth * coreData->mainScale),
-										(coreData->windowHeight * coreData->mainScale),
-										coreData->windowFlags);
+		(coreData->windowWidth * coreData->mainScale),
+		(coreData->windowHeight * coreData->mainScale),
+		coreData->windowFlags);
 	if (!coreData->window)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create window: %s", SDL_GetError());
 		return SDL_APP_FAILURE;
 	}
 
-	coreData->renderer = SDL_CreateRenderer(coreData->window, NULL); // openGL; vulkan; software
+	coreData->renderer = SDL_CreateRenderer(coreData->window, NULL); // openGL; vulkan; software, direct3d12
 	if (!coreData->renderer)
 	{
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't create renderer: %s", SDL_GetError());
@@ -67,7 +67,7 @@ SDL_AppResult Core::Iterate()
 	return SDL_APP_CONTINUE;
 }
 
-SDL_AppResult Core::ProcessEvent(const SDL_Event *event)
+SDL_AppResult Core::ProcessEvent(const SDL_Event* event)
 {
 	imWindow->ProcessEventImGui(event);
 

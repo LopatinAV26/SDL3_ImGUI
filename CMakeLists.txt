@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.31.6)
 project(SDL3_Engine VERSION 0.1.0 LANGUAGES CXX)
 
 # set the output directory for built objects.
@@ -35,9 +35,5 @@ else()
     message("else: ${CMAKE_CXX_FLAGS_RELEASE}")
 endif()
 
- #-fsanitize=address
-
-   # target_compile_options(main PUBLIC -Wall)
-
 add_subdirectory(engine)
-add_subdirectory(external)
+add_subdirectory(external EXCLUDE_FROM_ALL)

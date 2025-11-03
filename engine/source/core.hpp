@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 #include <memory>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_render.h>
