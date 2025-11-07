@@ -12,6 +12,14 @@ FetchContent_Declare(SDL3
 )
 FetchContent_MakeAvailable(SDL3)
 
+# SDL3_ttf ---------------------------------------------------------------------------------------
+FetchContent_Declare(SDL_ttf
+    GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
+    GIT_TAG release-3.2.2
+)
+FetchContent_MakeAvailable(SDL_ttf)
+
+
 # PoDoFo ------------------------------------------------------------------------------------
 if(WIN32)   #динамическая сборка PoDoFo
 find_package(podofo CONFIG REQUIRED)
@@ -39,14 +47,20 @@ FetchContent_MakeAvailable(podofo)
 target_include_directories(${PROJECT_NAME} PRIVATE ${PODOFO_INCLUDE_DIRS})
 endif()
 
-#target_link_libraries(${PROJECT_NAME} PRIVATE podofo::podofo)
-
 # imgui --------------------------------------------------------------------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/external/imgui")
 add_library(imgui STATIC)
 file(GLOB_RECURSE SRC_FILES imgui/*.cpp CMAKE_CONFIGURE_DEPENDS)
 target_sources(imgui PRIVATE ${SRC_FILES})
 target_link_libraries(imgui PRIVATE SDL3::SDL3)
+
+# imgui docking ----------------------------------------------------------------------------------
+#target_include_directories(${PROJECT_NAME} PRIVATE "${PROJECT_SOURCE_DIR}/external/imgui-docking")
+#add_library(imgui STATIC)
+#file(GLOB_RECURSE SRC_FILES imgui-docking/*.cpp CMAKE_CONFIGURE_DEPENDS)
+#target_sources(imgui PRIVATE ${SRC_FILES})
+#target_link_libraries(imgui PRIVATE SDL3::SDL3)
+
 
 # toml++ ------------------------------------------------------------------------------------
 FetchContent_Declare(tomlplusplus
@@ -59,7 +73,7 @@ FetchContent_MakeAvailable(tomlplusplus)
 target_link_libraries(${PROJECT_NAME} PRIVATE
                                     #SDL3_image::SDL3_image
                                     #SDL3_mixer::SDL3_mixer
-                                    #SDL3_ttf::SDL3_ttf
+                                    SDL3_ttf::SDL3_ttf
                                     imgui
                                     #implot
                                     tomlplusplus::tomlplusplus

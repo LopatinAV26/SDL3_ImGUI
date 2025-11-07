@@ -5,7 +5,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_render.h>
 
-struct CoreData
+struct ApplicationData
 {
 	SDL_Window *window{nullptr};
 	SDL_Renderer *renderer{nullptr};
@@ -14,9 +14,9 @@ struct CoreData
 	SDL_WindowFlags windowFlags{SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIGH_PIXEL_DENSITY};
 	float mainScale{1.25};
 	std::string_view driver;
-	// float deltaTime{0.f};
+	std::string fontName{"resources/fonts/ShareTechMonoRegular.ttf"};
+	float fontSize{13.0f};
 
-	// Флаги состояния окна
 	bool isWindowFocused{true};
 	bool isWindowMinimized{false};
 };
@@ -37,7 +37,6 @@ public:
 	SDL_AppResult ProcessEvent(const SDL_Event *event);
 
 private:
-	CoreData *coreData = new CoreData();
+	std::shared_ptr<ApplicationData> appData = std::make_shared<ApplicationData>();
 	std::unique_ptr<Gui> imWindow;
 };
-

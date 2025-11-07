@@ -2,14 +2,12 @@
 
 #include <memory>
 #include <podofo/podofo.h>
-// #include <SDL3/SDL.h>
-
-class Table;
+#include "tableCreator.hpp"
 
 class PdfCreator
 {
 public:
-    PdfCreator();
+    // PdfCreator();
     ~PdfCreator();
     void CreateTable();
     void SaveDocument(std::string_view fileName);

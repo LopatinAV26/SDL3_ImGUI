@@ -1,17 +1,9 @@
 #include "protocolVMC.hpp"
-#include "pdfCreator.hpp" //!!!!!!!!!!!!!!!!!!!!!!!!
-
-ProtocolVMC::ProtocolVMC()
-{
-    SDL_Log("ProtocolVMC constructed.\n");
-}
 
 void ProtocolVMC::WindowProtocol(bool &showProtocol)
 {
     ImGui::Begin("Заключение ВИК", &showProtocol);
     {
-        float width = ImGui::GetContentRegionAvail().x;
-
         if (ImGui::Button("Загрузить данные по умолчанию"))
         {
             ProtocolBase::GetDefaultProtocolData();        // Эта ф-я вызывается здесь для динамического обновления данных из файла по кнопке
@@ -20,22 +12,13 @@ void ProtocolVMC::WindowProtocol(bool &showProtocol)
 
         ImVec2 sizeTextField{0.f, 70.f};
 
-        ImGui::PushItemWidth(width); /////////////////////////////////////////
+        ImGui::InputTextMultiline("Наименование ЛНК", &protocolData->nameLab, sizeTextField, ImGuiInputTextFlags_WordWrap);
 
-        ImGui::Text("Наименование ЛНК");
-        ImGui::InputTextMultiline("##Наименование ЛНК", &protocolData->nameLab, sizeTextField, ImGuiInputTextFlags_WordWrap);
-        ImGui::NewLine();
+        ImGui::InputText("Номер свидетельства об аттестации", &protocolData->numberAttestation);
 
-        ImGui::Text("Номер свидетельства об аттестации");
-        ImGui::InputText("##Номер свидетельства об аттестации", &protocolData->numberAttestation);
-        ImGui::NewLine();
+        ImGui::InputTextMultiline("Наименование объекта", &protocolData->objectName, sizeTextField, ImGuiInputTextFlags_WordWrap);
 
-        ImGui::Text("Наименование объекта");
-        ImGui::InputTextMultiline("##Наименование объекта", &protocolData->objectName, sizeTextField, ImGuiInputTextFlags_WordWrap);
-        ImGui::NewLine();
-
-        ImGui::Text("Категория трубопровода");
-        if (ImGui::BeginCombo("##Категория трубопровода",
+        if (ImGui::BeginCombo("Категория трубопровода",
                               protocolData->pipeCategoryVector.at(protocolData->pipeCategoryIndex).c_str()))
         {
             for (int i = 0; i < protocolData->pipeCategoryVector.size(); ++i)
@@ -50,30 +33,15 @@ void ProtocolVMC::WindowProtocol(bool &showProtocol)
             ImGui::EndCombo();
         }
 
-        ImGui::NewLine();
+        ImGui::InputTextMultiline("Подрядная организация", &protocolData->contractorOrganization, sizeTextField, ImGuiInputTextFlags_WordWrap);
 
-        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 150, 0, 255));
-        ImGui::Text("Подрядная организация");
-        ImGui::PopStyleColor();
-        ImGui::InputTextMultiline("##Подрядная организация", &protocolData->contractorOrganization, sizeTextField, ImGuiInputTextFlags_WordWrap);
-        ImGui::NewLine();
+        ImGui::InputTextMultiline("Организация заказчика", &protocolData->customerOrganization, sizeTextField, ImGuiInputTextFlags_WordWrap);
 
-        ImGui::Text("Организация заказчика");
-        ImGui::InputTextMultiline("##Организация заказчика", &protocolData->customerOrganization, sizeTextField, ImGuiInputTextFlags_WordWrap);
-        ImGui::NewLine();
+        ImGui::InputText("Дата выдачи заключения", &protocolData->dateOfIssue);
 
-        ImGui::Text("Дата выдачи заключения");
-        ImGui::InputText("##Дата выдачи заключения", &protocolData->dateOfIssue);
-        ImGui::NewLine();
+        ImGui::InputText("Дата проведения контроля", &protocolData->controlDate);
 
-        ImGui::Text("Дата проведения контроля");
-        ImGui::InputText("##Дата проведения контроля", &protocolData->controlDate);
-        ImGui::NewLine();
-
-        ImGui::Text("Номер сварного соединения");
-        ImGui::InputText("##Номер сварного соединения", &protocolData->weldNumber);
-
-        ImGui::PopItemWidth(); /////////////////////////////////////////////////
+        ImGui::InputText("Номер сварного соединения", &protocolData->weldNumber);
     }
 
     if (ImGui::Button("Создать PDF"))
@@ -133,9 +101,4 @@ void ProtocolVMC::CreateTable()
 
         ImGui::EndTable();
     }
-}
-
-ProtocolVMC::~ProtocolVMC()
-{
-    SDL_Log("ProtocolVMC destructed.\n");
 }

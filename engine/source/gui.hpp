@@ -1,24 +1,24 @@
 #pragma once
 
 #include <memory>
+
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
 #include "imgui_stdlib.h"
-//#include "imgui_internal.h"
+// #include "imgui_internal.h"
 #include "implot.h"
 #include "implot_internal.h"
 
 #include "protocolVMC.hpp"
 #include "nomogram.hpp"
 
-struct CoreData;
-//class ProtocolVMC;
+struct ApplicationData;
 
 class Gui
 {
 public:
-	explicit Gui(const CoreData *appData);
+	explicit Gui(const std::shared_ptr<ApplicationData> appData);
 	~Gui();
 
 	void InitImGui();
@@ -30,9 +30,9 @@ private:
 	void FullscreenWindow();
 	void DebugWindow();
 
-	const CoreData *p_coreData{nullptr};
-	std::unique_ptr<ProtocolVMC> p_protocolVMC;
-	std::unique_ptr<Nomogram> p_nomogram;
+	std::shared_ptr<ApplicationData> appData;
+	std::unique_ptr<ProtocolVMC> protocolVMC;
+	std::unique_ptr<Nomogram> nomogram;
 
 	bool showFullscreenWindow{true};
 	bool showDebugWindow{true};

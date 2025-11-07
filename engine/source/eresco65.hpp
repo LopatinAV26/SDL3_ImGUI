@@ -1,39 +1,26 @@
 #pragma once
 
-#include <vector>
-#include <cmath>
-#include <string>
-#include "implot.h"
+#include "xrayBase.hpp"
 
-class Eresco65
+class Eresco65 final : public XrayBase
 {
 public:
-    Eresco65();
+    explicit Eresco65();
+    virtual ~Eresco65() = default;
 
-    void Plot(const float &focusDistance, const float &mA, const int &measure_index, const float &exposureMultiplier);
+    void Draw(float focusDistance, float mA, int measure_index, float exposureMultiplier) override;
+    virtual XrayData GetData() override { return data; }
 
+private:
     std::string xrayTubeName{"Eresco 65 MF4"};
     float kVmaximum{300};
     float mAminimum{0.5f};
     float mAmaximum{6.0f};
     int electricPower{900};
-    //float exposureMultiplier{1.5f};
-
-private:
-    /* Возвращает интенсивность излучения в зависимости от фокусного расстояния
-    \param intensity_0 интенсивность излучения известная (по заводской номограмме)
-    \param focusDistance_0 расстояние до источника излучения известное (по заводской номограмме)
-    \param focusDistance_1 требуемое расстояние до источника
-    */
-    float CalculateIntensity(const float &intensity_0,
-                             const float &focusDistance_0,
-                             const float &focusDistance_1);
-
-    float ToMinute(const float &exposition, const float &mA);
-
-    float ToSecond(const float &exposition, const float &mA);
-
     int focusDistanceDefault{700};
+    // float exposureMultiplier{1.5f};
+
+    XrayData data;
 
     std::vector<std::vector<float>> diagramLinesDefault;
     std::vector<std::vector<float>> resultDiagramLines;

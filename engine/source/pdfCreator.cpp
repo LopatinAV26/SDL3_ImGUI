@@ -1,9 +1,4 @@
 #include "pdfCreator.hpp"
-#include "tableCreator.hpp"
-
-PdfCreator::PdfCreator()
-{
-}
 
 PdfCreator::~PdfCreator()
 {

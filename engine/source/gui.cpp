@@ -4,8 +4,8 @@
 
 #include "core.hpp"
 
-Gui::Gui(const CoreData *appData)
-	: p_coreData{appData}
+Gui::Gui(const std::shared_ptr<ApplicationData> appData)
+	: appData{appData}
 {
 }
 
@@ -17,7 +17,7 @@ void Gui::InitImGui()
 	ImPlot::CreateContext();
 	[[maybe_unused]] ImGuiIO &io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
 
 	// Загружаем и настраиваем шрифт
 	ImFontConfig font_config;
@@ -25,8 +25,8 @@ void Gui::InitImGui()
 	font_config.OversampleV = 2;	// Включаем вертикальный оверсэмплинг
 	font_config.PixelSnapH = false; // Отключаем привязку к пикселям для лучшего дробного масштабирования
 
-	io.Fonts->AddFontFromFileTTF("resources/fonts/ShareTechMonoRegular.ttf",
-								 13.0f,
+	io.Fonts->AddFontFromFileTTF(appData->fontName.c_str(),
+								 appData->fontSize,
 								 &font_config);
 
 	// ImGui::StyleColorsDark();
@@ -35,12 +35,12 @@ void Gui::InitImGui()
 
 	// Setup scaling
 	ImGuiStyle &style = ImGui::GetStyle();
-	style.ScaleAllSizes(p_coreData->mainScale);
-	style.FontScaleDpi = p_coreData->mainScale;
+	style.ScaleAllSizes(appData->mainScale);
+	style.FontScaleDpi = appData->mainScale;
 	style.WindowRounding = 4.0f;
 
-	ImGui_ImplSDL3_InitForSDLRenderer(p_coreData->window, p_coreData->renderer);
-	ImGui_ImplSDLRenderer3_Init(p_coreData->renderer);
+	ImGui_ImplSDL3_InitForSDLRenderer(appData->window, appData->renderer);
+	ImGui_ImplSDLRenderer3_Init(appData->renderer);
 
 	SDL_Log("ImGui initialized successfully.");
 }
@@ -68,25 +68,22 @@ void Gui::IterateImGui()
 		FullscreenWindow();
 
 	if (showProtocolVMC)
-		p_protocolVMC->WindowProtocol(showProtocolVMC);
-	if (!showProtocolVMC && p_protocolVMC != nullptr)
-	{
-		SDL_Log("ProtocolVMC closed");
-		p_protocolVMC.reset();
-	}
+		protocolVMC->WindowProtocol(showProtocolVMC);
+
+	if (!showProtocolVMC && protocolVMC != nullptr)
+		protocolVMC.reset();
 
 	if (showNomogram)
-		p_nomogram->NomogramWindow(showNomogram);
-	if (!showNomogram && p_nomogram != nullptr)
-	{
-		SDL_Log("Nomogram closed");
-		p_nomogram.reset();
-	}
+		nomogram->NomogramWindow(showNomogram);
+
+	if (!showNomogram && nomogram != nullptr)
+		nomogram.reset();
+
 	//---------------------------------
 
 	// Для работы с HiDPI
 	ImGuiIO &io = ImGui::GetIO();
-	SDL_SetRenderScale(p_coreData->renderer,
+	SDL_SetRenderScale(appData->renderer,
 					   io.DisplayFramebufferScale.x,
 					   io.DisplayFramebufferScale.y);
 }
@@ -95,7 +92,7 @@ void Gui::IterateImGui()
 void Gui::RenderImGui()
 {
 	ImGui::Render();
-	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), p_coreData->renderer);
+	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), appData->renderer);
 }
 
 void Gui::DebugWindow()
@@ -103,8 +100,8 @@ void Gui::DebugWindow()
 	ImGuiIO &io = ImGui::GetIO();
 	ImGui::Begin("DebugWindow", &showDebugWindow);
 	{
-		ImGui::Text("API: %s", SDL_GetRendererName(p_coreData->renderer));
-		ImGui::Text("Driver: %s", p_coreData->driver.data());
+		ImGui::Text("API: %s", SDL_GetRendererName(appData->renderer));
+		ImGui::Text("Driver: %s", appData->driver.data());
 
 		fpsUpdateTimer += io.DeltaTime;
 		if (fpsUpdateTimer >= 0.5f)
@@ -148,15 +145,15 @@ void Gui::FullscreenWindow()
 	if (ImGui::Button("Создать заключение ВИК"))
 	{
 		showProtocolVMC = true;
-		if (p_protocolVMC == nullptr)
-			p_protocolVMC = std::make_unique<ProtocolVMC>();
+		if (protocolVMC == nullptr)
+			protocolVMC = std::make_unique<ProtocolVMC>();
 	}
 
 	if (ImGui::Button("Открыть номограмму РК"))
 	{
 		showNomogram = true;
-		if (p_nomogram == nullptr)
-			p_nomogram = std::make_unique<Nomogram>();
+		if (nomogram == nullptr)
+			nomogram = std::make_unique<Nomogram>();
 	}
 
 	ImGui::End();
@@ -168,6 +165,5 @@ Gui::~Gui()
 	ImGui_ImplSDL3_Shutdown();
 	ImPlot::DestroyContext();
 	ImGui::DestroyContext();
-	p_coreData = nullptr;
 	SDL_Log("ImGui shutdown complete.");
 }

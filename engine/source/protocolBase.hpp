@@ -15,8 +15,10 @@ struct ProtocolData;
 class ProtocolBase
 {
 public:
-    ProtocolBase();
-    virtual ~ProtocolBase();
+    virtual ~ProtocolBase() = default;
+
+    virtual void WindowProtocol(bool &showProtocol) = 0;
+    virtual void SaveProtocol() = 0;
 
 protected:
     void ParseConfig(std::string_view pathToConfig, toml::table &tbl);
@@ -25,9 +27,6 @@ protected:
     std::shared_ptr<ProtocolData> baseProtocolData = std::make_shared<ProtocolData>();
 
 private:
-    virtual void WindowProtocol(bool &showProtocol) = 0;
-    virtual void SaveProtocol() = 0;
-
     std::string_view pathToDefaultProtocol{"resources/config/base_protocol_data.toml"};
     toml::table baseTable;
 };
@@ -46,13 +45,13 @@ struct ProtocolData
 
     std::string objectName{"Объект контроля"};
 
-    std::vector<std::string> pipeCategoryVector{"-"};
+    std::vector<std::string> pipeCategoryVector{"В", "I", "II", "III", "-"};
     int pipeCategoryIndex{0};
 
     std::string contractorOrganization{"Подрядная организация"};
     std::string customerOrganization{"Организация заказчика"};
 
-    std::string technologicalControlMap = {"ТК-ТНДВ-ВИК"};
+    std::vector<std::string> technologicalControlMap = {"ТК-ТНДВ-ВИК", "ТК-ТНДВ-ПВК", "ТК-ТНДВ-УК"};
     int technologicalControlMapIndex{0};
 
     std::string equipment{"Средства контроля"};

@@ -1,7 +1,11 @@
 #include "nomogram.hpp"
+#include <thread>
 
 Nomogram::Nomogram()
 {
+    xray.reserve(2);
+    xray.push_back(std::make_unique<Eresco32>());
+    xray.push_back(std::make_unique<Eresco65>());
 }
 
 void Nomogram::NomogramWindow(bool &isOpen)
@@ -18,26 +22,31 @@ void Nomogram::NomogramWindow(bool &isOpen)
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoSavedSettings; */
 
-    ImGui::Begin("Диаграмма экспозиции", &isOpen /*window_flags*/);
-
-    ImGui::RadioButton(eresco32.xrayTubeName.c_str(), &xrayTube_index, 0);
-    ImGui::RadioButton(eresco65.xrayTubeName.c_str(), &xrayTube_index, 1);
-
-    ImGui::DragInt("Фокусное расстояние, мм", &focusDistance, 1, 10, 1400);
-
-    // ImGui::SliderFloat("Требуемая плотность снимка, е.о.п.", &opticalDensity, 1.0f, 4.0f, "%.1f");
-
+    if (ImGui::Begin("Расчёт экспозиции", &isOpen /*window_flags*/))
     {
+        for (int i = 0; i < xray.size(); ++i)
+        {
+            ImGui::PushID(i);
+            ImGui::RadioButton(xray.at(i)->GetData().xrayTubeName.c_str(), &xrayTube_index, i);
+            ImGui::PopID();
+        }
+
+        ImGui::DragInt("Фокусное расстояние, мм", &focusDistance, 1, 10, 1400);
+
+        // ImGui::SliderFloat("Требуемая плотность снимка, е.о.п.", &opticalDensity, 1.0f, 4.0f, "%.1f");
+
         ImGui::RadioButton("мА х мин", &measurementUnits_index, 0);
         ImGui::SameLine();
         ImGui::RadioButton("минуты", &measurementUnits_index, 1);
         ImGui::SameLine();
         ImGui::RadioButton("секунды", &measurementUnits_index, 2);
 
+        bool mAIsDisabled{false};
         switch (measurementUnits_index)
         {
         case 0:
             nameAxisY = "Экспозиция, мА х мин";
+            mAIsDisabled = true;
             break;
         case 1:
             nameAxisY = "Время экспозиции, мин";
@@ -47,45 +56,36 @@ void Nomogram::NomogramWindow(bool &isOpen)
             break;
         }
 
-        bool mAIsDisabled{false};
-        if (measurementUnits_index == 0)
-            mAIsDisabled = true;
-
         ImGui::BeginDisabled(mAIsDisabled);
         ImGui::SliderFloat("Сила тока, мА", &mA, mAminimum, mAmaximum, "%.1f");
         ImGui::EndDisabled();
-    }
 
-    ImGui::SliderFloat("Множитель экспозиции", &exposureMultiplier, 0.5, 3.0, "%.1f");
-    ImGui::SetItemTooltip("Подбирается индивидуально при тестовом просвечивании");
+        ImGui::SliderFloat("Множитель экспозиции", &exposureMultiplier, 0.5, 3.0, "%.1f");
+        ImGui::SetItemTooltip("Подбирается индивидуально при тестовом просвечивании");
 
-    if (ImPlot::BeginPlot(plotTitle.c_str(), ImGui::GetContentRegionAvail()))
-    {
-        ImPlot::SetupAxes("Толщина стали, мм", nameAxisY.c_str(), ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
-        PlotNomogram(xrayTube_index);
-        ImPlot::EndPlot();
-    }
-    ImGui::End();
-}
+        if (ImPlot::BeginPlot(plotTitle.c_str(), ImVec2(-1, ImGui::GetContentRegionAvail().y - 75)))
+        {
+            ImPlot::SetupAxes("Толщина стали, мм", nameAxisY.c_str());
+            // std::jthread(&Nomogram::PlotNomogram, this, xrayTube_index);
+            DrawNomogram(xrayTube_index);
+            ImPlot::EndPlot();
+        }
 
-void Nomogram::PlotNomogram(const int &xrayTube_index)
-{
-    switch (xrayTube_index)
-    {
-    case 0:
-        mAminimum = eresco32.mAminimum;
-        mAmaximum = eresco32.mAmaximum;
-        eresco32.Plot(focusDistance, mA, measurementUnits_index, exposureMultiplier);
-        break;
-    case 1:
-        mAminimum = eresco65.mAminimum;
-        mAmaximum = eresco65.mAmaximum;
-        eresco65.Plot(focusDistance, mA, measurementUnits_index, exposureMultiplier);
-        break;
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 255, 0, 255));
+        ImGui::TextWrapped("Необходимо понимать, что рентгеновские плёнки и, особенно экраны имеют разброс по чувствительности, а рентгеновские аппараты - неизбежный технологический разброс параметров, поэтому расчитанное по номограммам время не является точным, а служит только для предварительной оценки. При расчёте номограмм используются усреднённые паспортные значения чувствительности плёнок и экранов, а также линейных коэффициентов ослабления рентгеновского излучения в материалах. В каждом конкретном случае сочетание параметров может быть иным и время экспозиции может несколько отличаться от расчитанного по номограммам. Также на итоговую оптическую плотность рентгеновского снимка влияет тип/марка проявителя, его концентрация, температура и время проявки.");
+        ImGui::PopStyleColor();
+
+        ImGui::End();
     }
 }
 
-Nomogram::~Nomogram()
+void Nomogram::DrawNomogram(int xrayTube_index)
 {
-    SDL_Log("Nomogram deleted");
+    for (int i = 0; i < xray.size(); ++i)
+    {
+        plotTitle = xray.at(xrayTube_index)->GetData().xrayTubeName;
+        mAminimum = xray.at(xrayTube_index)->GetData().mAminimum;
+        mAmaximum = xray.at(xrayTube_index)->GetData().mAmaximum;
+        xray.at(xrayTube_index)->Draw(focusDistance, mA, measurementUnits_index, exposureMultiplier);
+    }
 }

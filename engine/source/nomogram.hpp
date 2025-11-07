@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "imgui.h"
 #include "imgui_stdlib.h"
 #include "implot.h"
@@ -12,13 +14,11 @@
 class Nomogram
 {
 public:
-    Nomogram();
-    ~Nomogram();
-
+    explicit Nomogram();
     void NomogramWindow(bool &isOpen);
 
 private:
-    void PlotNomogram(const int &xrayTube_index);
+    void DrawNomogram(int xrayTube_index);
 
     int xrayTube_index{0};
     int focusDistance{700};
@@ -31,6 +31,5 @@ private:
     std::string plotTitle{"Диаграмма экспозиции РА"};
     std::string nameAxisY{};
 
-    Eresco32 eresco32;
-    Eresco65 eresco65;
+    std::vector<std::unique_ptr<XrayBase>> xray;
 };

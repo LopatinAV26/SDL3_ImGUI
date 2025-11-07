@@ -1,14 +1,14 @@
 #pragma once
 
 #include "protocolBase.hpp"
+#include "pdfCreator.hpp"
 
 class ProtocolVMC : public ProtocolBase
 {
 public:
-    explicit ProtocolVMC();
-    virtual ~ProtocolVMC();
+    virtual ~ProtocolVMC() = default;
 
-    virtual void WindowProtocol(bool &isOpen) override;
+    virtual void WindowProtocol(bool &showProtocol) override;
     virtual void SaveProtocol() override;
     void CreateTable();
 

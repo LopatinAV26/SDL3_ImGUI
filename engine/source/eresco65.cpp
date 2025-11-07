@@ -2,11 +2,18 @@
 
 Eresco65::Eresco65()
 {
+    data.electricPower = {electricPower};
+    data.focusDistanceDefault = {focusDistanceDefault};
+    data.kVmaximum = {kVmaximum};
+    data.mAminimum = {mAminimum};
+    data.mAmaximum = {mAmaximum};
+    data.xrayTubeName = {xrayTubeName};
+
     diagramLinesDefault = {x80, y80, x100, y100, x120, y120, x140, y140, x160, y160, x180, y180, x200, y200, x220, y220, x240, y240, x275, y275, x300, y300};
     resultDiagramLines = diagramLinesDefault;
 }
 
-void Eresco65::Plot(const float &focusDistance, const float &mA, const int &measure_index, const float &exposureMultiplier)
+void Eresco65::Draw(float focusDistance, float mA, int measure_index, float exposureMultiplier)
 {
     for (size_t i = 1; i < resultDiagramLines.size(); i += 2)
     {
@@ -58,19 +65,4 @@ void Eresco65::Plot(const float &focusDistance, const float &mA, const int &meas
             }
         }
     }
-}
-
-float Eresco65::CalculateIntensity(const float &intensity_0, const float &focusDistance_0, const float &focusDistance_1)
-{
-    return intensity_0 / std::pow((focusDistance_0 / focusDistance_1), 2);
-}
-
-float Eresco65::ToMinute(const float &exposition, const float &mA)
-{
-    return exposition / mA;
-}
-
-float Eresco65::ToSecond(const float &exposition, const float &mA)
-{
-    return (exposition / mA) * 60;
 }
