@@ -11,6 +11,8 @@ Eresco65::Eresco65()
 
     diagramLinesDefault = {x80, y80, x100, y100, x120, y120, x140, y140, x160, y160, x180, y180, x200, y200, x220, y220, x240, y240, x275, y275, x300, y300};
     resultDiagramLines = diagramLinesDefault;
+
+    data.info = info;
 }
 
 void Eresco65::Draw(float focusDistance, float mA, int measure_index, float exposureMultiplier)

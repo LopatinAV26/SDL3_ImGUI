@@ -11,6 +11,8 @@ Eresco32::Eresco32()
 
     diagramLinesDefault = {x80, y80, x100, y100, x120, y120, x140, y140, x160, y160, x180, y180, x200, y200};
     resultDiagramLines = diagramLinesDefault;
+
+    data.info = info;
 }
 
 void Eresco32::Draw(float focusDistance, float mA, int measure_index, float exposureMultiplier)

@@ -13,6 +13,7 @@ public:
 
 private:
     std::string xrayTubeName{"Eresco 65 MF4"};
+    std::string info{"тип РА: постоянный\nнапряжение: 300 кВ\nдиаметр фокусного пятна: 3.0 мм"};
     float kVmaximum{300};
     float mAminimum{0.5f};
     float mAmaximum{6.0f};

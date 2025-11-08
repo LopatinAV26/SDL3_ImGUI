@@ -5,6 +5,8 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_render.h>
 
+#include "gui.hpp"
+
 struct ApplicationData
 {
 	SDL_Window *window{nullptr};
@@ -21,11 +23,11 @@ struct ApplicationData
 	bool isWindowMinimized{false};
 };
 
-class Gui;
+//class Gui;
 class Core
 {
 public:
-	Core();
+	Core() = default;
 	Core(const Core &) = delete;
 	Core &operator=(const Core &) = delete;
 	Core(Core &&) = delete;

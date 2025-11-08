@@ -8,8 +8,10 @@
 struct XrayData
 {
     std::string xrayTubeName{"-"};
+    std::string info{""};
     float focalSpotSize{1.0f};
     float kVmaximum{300.0f};
+    bool currentAdjustment{true};
     float mAminimum{0.5f};
     float mAmaximum{10.0f};
     int electricPower{1000};

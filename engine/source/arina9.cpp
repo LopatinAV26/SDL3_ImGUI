@@ -7,10 +7,13 @@ Arina9::Arina9()
     data.kVmaximum = {kVmaximum};
     data.mAminimum = {mAminimum};
     data.mAmaximum = {mAmaximum};
+    data.currentAdjustment = {currentAdjustment};
     data.xrayTubeName = {xrayTubeName};
 
     diagramLinesDefault = {d7x300, d7y300};
     resultDiagramLines = diagramLinesDefault;
+
+    data.info = info;
 }
 
 void Arina9::Draw(float focusDistance, float mA, int measure_index, float exposureMultiplier)

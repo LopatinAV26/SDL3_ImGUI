@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "imgui.h"
 #include "imgui_stdlib.h"
@@ -10,6 +11,7 @@
 
 #include "eresco32.hpp"
 #include "eresco65.hpp"
+#include "arina9.hpp"
 
 class Nomogram
 {
@@ -24,12 +26,14 @@ private:
     int focusDistance{700};
     float exposureMultiplier{1.f};
     // float opticalDensity{2.0f};
-    float mAminimum{0.f};
+    bool currentAdjustment{true};
+    float mAminimum{0.5f};
     float mAmaximum{10.0f};
     float mA{3.f};
     int measurementUnits_index{0};
     std::string plotTitle{"Диаграмма экспозиции РА"};
-    std::string nameAxisY{};
+    std::string nameAxisY{""};
+    std::string xrayInfo{""};
 
     std::vector<std::unique_ptr<XrayBase>> xray;
 };

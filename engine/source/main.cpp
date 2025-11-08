@@ -1,6 +1,8 @@
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <SDL3/SDL_main.h>
+
 #include <memory>
+
 #include "core.hpp"
 
 auto core = std::make_unique<Core>();
@@ -21,5 +23,4 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 };
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result) {
-
 };

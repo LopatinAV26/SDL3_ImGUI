@@ -1,11 +1,5 @@
 #include "core.hpp"
 
-#include "gui.hpp"
-
-Core::Core()
-{
-}
-
 SDL_AppResult Core::Init()
 {
 	if (!SDL_Init(SDL_INIT_VIDEO))
