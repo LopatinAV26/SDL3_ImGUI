@@ -8,16 +8,16 @@ set(SDL_STATIC ON)
 # SDL3 ---------------------------------------------------------------------------------------
 FetchContent_Declare(SDL3
     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
-    GIT_TAG preview-3.3.2
+    GIT_TAG release-3.4.0
 )
 FetchContent_MakeAvailable(SDL3)
 
 # SDL3_ttf ---------------------------------------------------------------------------------------
-FetchContent_Declare(SDL_ttf
-    GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
-    GIT_TAG release-3.2.2
-)
-FetchContent_MakeAvailable(SDL_ttf)
+#FetchContent_Declare(SDL_ttf
+#    GIT_REPOSITORY https://github.com/libsdl-org/SDL_ttf.git
+ #   GIT_TAG release-3.2.2
+#)
+#FetchContent_MakeAvailable(SDL_ttf)
 
 
 # PoDoFo ------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ set(PODOFO_BUILD_LIB_ONLY TRUE CACHE BOOL "" FORCE)
 set(PODOFO_BUILD_STATIC TRUE CACHE BOOL "" FORCE)
 FetchContent_Declare(podofo
     GIT_REPOSITORY https://github.com/podofo/podofo.git
-    GIT_TAG 1.0.2
+    GIT_TAG 1.0.3
 )
 FetchContent_MakeAvailable(podofo)
 #Без этой команды #include <podofo/podofo.h> не включается
@@ -73,7 +73,7 @@ FetchContent_MakeAvailable(tomlplusplus)
 target_link_libraries(${PROJECT_NAME} PRIVATE
                                     #SDL3_image::SDL3_image
                                     #SDL3_mixer::SDL3_mixer
-                                    SDL3_ttf::SDL3_ttf
+                                    #SDL3_ttf::SDL3_ttf
                                     imgui
                                     #implot
                                     tomlplusplus::tomlplusplus
