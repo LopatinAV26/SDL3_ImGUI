@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.1.1)
+cmake_minimum_required(VERSION 4.2.0)
 project(SDL3_Engine VERSION 0.1.0 LANGUAGES CXX)
 
 # set the output directory for built objects.
