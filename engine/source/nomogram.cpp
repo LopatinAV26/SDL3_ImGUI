@@ -1,5 +1,12 @@
 #include "nomogram.hpp"
 
+#include "imgui.h"
+#include "implot.h"
+
+#include "arina9.hpp"
+#include "eresco32.hpp"
+#include "eresco65.hpp"
+
 Nomogram::Nomogram()
 {
     xray.reserve(3);
@@ -24,7 +31,7 @@ void Nomogram::NomogramWindow(bool &isOpen)
 
     if (ImGui::Begin("Расчёт экспозиции", &isOpen /*window_flags*/))
     {
-        for (int i = 0; i < xray.size(); ++i)
+        for (size_t i = 0; i < xray.size(); ++i)
         {
             plotTitle = xray.at(xrayTube_index)->GetData().xrayTubeName;
             mAminimum = xray.at(xrayTube_index)->GetData().mAminimum;
@@ -43,7 +50,7 @@ void Nomogram::NomogramWindow(bool &isOpen)
         ImGui::Text("%s", xrayInfo.c_str());
 
         ImGui::DragInt("Фокусное расстояние, мм", &focusDistance, 1, 10, 1400);
-
+        ImGui::DragFloat("Толщина стали, мм", &materialThickness, 0.1f, 1.0f, 70.0f, "%.1f");
         // ImGui::SliderFloat("Требуемая плотность снимка, е.о.п.", &opticalDensity, 1.0f, 4.0f, "%.1f");
 
         if (!currentAdjustment && measurementUnits_index == 0)
@@ -82,9 +89,10 @@ void Nomogram::NomogramWindow(bool &isOpen)
         ImGui::SliderFloat("Множитель экспозиции", &exposureMultiplier, 0.5, 3.0, "%.1f");
         ImGui::SetItemTooltip("Подбирается индивидуально при тестовом просвечивании");
 
-        if (ImPlot::BeginPlot(plotTitle.c_str(), ImVec2(-1, ImGui::GetContentRegionAvail().y - 90)))
+        if (ImPlot::BeginPlot(plotTitle.c_str(), ImVec2(-1, ImGui::GetContentRegionAvail().y - 90), ImPlotFlags_NoLegend))
         {
-            ImPlot::SetupAxes("Толщина стали, мм", nameAxisY.c_str());
+            ImPlot::SetupAxes("Толщина стали, мм", nameAxisY.c_str(), ImPlotAxisFlags_AutoFit, ImPlotAxisFlags_AutoFit);
+            ImPlot::SetupAxisScale(ImAxis_Y1, ImPlotScale_Log10);
             DrawNomogram(xrayTube_index);
             ImPlot::EndPlot();
         }
@@ -99,8 +107,8 @@ void Nomogram::NomogramWindow(bool &isOpen)
 
 void Nomogram::DrawNomogram(int xrayTube_index)
 {
-    for (int i = 0; i < xray.size(); ++i)
+    for (size_t i = 0; i < xray.size(); ++i)
     {
-        xray.at(xrayTube_index)->Draw(focusDistance, mA, measurementUnits_index, exposureMultiplier);
+        xray.at(xrayTube_index)->Draw(focusDistance, mA, measurementUnits_index, exposureMultiplier, materialThickness);
     }
 }

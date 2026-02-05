@@ -8,7 +8,11 @@ public:
     explicit Arina9();
     virtual ~Arina9() = default;
 
-    void Draw(float focusDistance, float mA, int measure_index, float exposureMultiplier) override;
+    void Draw(float focusDistance,
+              float mA,
+              int measure_index,
+              float exposureMultiplier,
+              float thicknessMarker) override;
     virtual XrayData GetData() override { return data; }
 
 private:

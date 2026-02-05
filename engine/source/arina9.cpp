@@ -1,5 +1,7 @@
 #include "arina9.hpp"
 
+#include "implot.h"
+
 Arina9::Arina9()
 {
     data.electricPower = {electricPower};
@@ -16,7 +18,7 @@ Arina9::Arina9()
     data.info = info;
 }
 
-void Arina9::Draw(float focusDistance, float mA, int measure_index, float exposureMultiplier)
+void Arina9::Draw(float focusDistance, float mA, int measure_index, float exposureMultiplier, float thicknessMarker)
 {
     for (size_t i = 1; i < resultDiagramLines.size(); i += 2)
     {
@@ -36,5 +38,11 @@ void Arina9::Draw(float focusDistance, float mA, int measure_index, float exposu
         }
     }
 
+    std::vector<DiagramLineRef> visibleLines;
+    visibleLines.reserve(resultDiagramLines.size() / 2);
+
     ImPlot::PlotLine("D7 + Pb 0.027 мм", resultDiagramLines.at(0).data(), resultDiagramLines.at(1).data(), resultDiagramLines.at(0).size());
+    visibleLines.push_back({&resultDiagramLines.at(0), &resultDiagramLines.at(1), ImPlot::GetLastItemColor(), "D7 + Pb 0.027 мм"});
+
+    DrawThicknessMarkers(visibleLines, thicknessMarker);
 }

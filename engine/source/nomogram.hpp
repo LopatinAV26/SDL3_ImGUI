@@ -3,15 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "imgui.h"
-#include "imgui_stdlib.h"
-#include "implot.h"
-// #include "implot_internal.h"
-#include "SDL3/SDL_log.h"
-
-#include "eresco32.hpp"
-#include "eresco65.hpp"
-#include "arina9.hpp"
+#include "xrayBase.hpp"
 
 class Nomogram
 {
@@ -30,6 +22,7 @@ private:
     float mAminimum{0.5f};
     float mAmaximum{10.0f};
     float mA{3.f};
+    float materialThickness{10.0f};
     int measurementUnits_index{0};
     std::string plotTitle{"Диаграмма экспозиции РА"};
     std::string nameAxisY{""};

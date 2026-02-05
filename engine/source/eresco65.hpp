@@ -8,7 +8,11 @@ public:
     explicit Eresco65();
     virtual ~Eresco65() = default;
 
-    void Draw(float focusDistance, float mA, int measure_index, float exposureMultiplier) override;
+    void Draw(float focusDistance,
+              float mA,
+              int measure_index,
+              float exposureMultiplier,
+              float thicknessMarker) override;
     virtual XrayData GetData() override { return data; }
 
 private:

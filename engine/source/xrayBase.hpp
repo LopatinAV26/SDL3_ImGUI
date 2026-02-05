@@ -1,9 +1,9 @@
 #pragma once
 
 #include <vector>
-#include <cmath>
 #include <string>
-#include "implot.h"
+
+#include "imgui.h"
 
 struct XrayData
 {
@@ -19,12 +19,24 @@ struct XrayData
     float exposureMultiplier{1.5f};
 };
 
+struct DiagramLineRef
+{
+    const std::vector<float> *x{nullptr};
+    const std::vector<float> *y{nullptr};
+    ImVec4 color{1.0f, 1.0f, 1.0f, 1.0f};
+    std::string label;
+};
+
 class XrayBase
 {
 public:
     virtual ~XrayBase() = default;
 
-    virtual void Draw(float focusDistance, float mA, int measure_index, float exposureMultiplier) = 0;
+    virtual void Draw(float focusDistance,
+                      float mA,
+                      int measure_index,
+                      float exposureMultiplier,
+                      float thicknessMarker) = 0;
     virtual XrayData GetData() = 0;
 
 protected:
@@ -40,4 +52,8 @@ protected:
     virtual float ToMinute(float exposition, float mA) const;
 
     virtual float ToSecond(float exposition, float mA) const;
+
+    void DrawThicknessMarkers(const std::vector<DiagramLineRef> &lines,
+                              float thickness,
+                              bool drawVerticalLine = true) const;
 };
